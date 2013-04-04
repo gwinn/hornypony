@@ -18,7 +18,7 @@ To control you unicorn instances run:
 Where command is:
 `<start|stop|restart|upgrade|force-stop|reopen-logs>`
 
-instance is name of one of your configuration files in `/etc/unicorn` directory
+instance is a name of one of your configuration files in `/etc/unicorn` directory
 
-and environment is an you application environment:
+and environment is an your application environment:
 `production` or `development`
