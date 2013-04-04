@@ -1,0 +1,22 @@
+# Horny Pony
+
+Simple init script for multiply unicorn instance
+
+## Setup
+
+* Put all files in `/etc`
+* Change user name & application path in *.conf files
+* Make sure that you have bundle gem installed
+
+
+## Usage
+
+To control you unicorn instances run:
+
+`/etc/init.d/pony command instance`
+
+Where command is: 
+
+`<start|stop|restart|upgrade|force-stop|reopen-logs>`
+
+and instance is name of one of your configuration files in `/etc/unicorn` directory
