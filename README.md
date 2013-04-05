@@ -13,12 +13,8 @@ Simple init script for multiply unicorn instance
 
 To control you unicorn instances run:
 
-`/etc/init.d/pony command instance environment`
+`/etc/init.d/pony -i <instance_name> -c <start|stop|restart|upgrade|force-stop|reopen-logs> [-e
+<development|production|test>]`
 
-Where command is:
-`<start|stop|restart|upgrade|force-stop|reopen-logs>`
+instance_name is a name of one of your configuration files in `/etc/unicorn` directory
 
-instance is a name of one of your configuration files in `/etc/unicorn` directory
-
-and environment is an your application environment:
-`production` or `development`
