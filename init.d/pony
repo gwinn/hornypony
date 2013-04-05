@@ -6,27 +6,37 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Manage unicorn server
-# Description:       Start, stop, restart unicorn server for a specific application.
+# Description:       Start, stop, restart unicorn server for a ruby application.
 ### END INIT INFO
 
 set -e
 
-if [[ -z $2 ]]; then
-  echo >&2 "Instance name required" && exit 0
+while getopts c:i:e: option
+do
+  case "${option}"
+  in
+    c) COMMAND=${OPTARG};;
+    i) INSTANCE=${OPTARG};;
+    e) ENVIRONMENT=${OPTARG};;
+  esac
+done
+
+if [ -z $INSTANCE ]; then
+  echo >&2 "Instance name required"
+  exit 0
 fi
 
-if [[ -z $3 ]]; then
-  echo >&2 "Environment name required" && exit 0
+if [ -z $COMMAND ]; then
+  echo >&2 "Usage: $0 -i <instance_name> -c <start|stop|restart|upgrade|force-stop|reopen-logs> [-e <environment_name>]"
+  exit 0
 fi
 
-source /etc/unicorn/$2.conf
+source /etc/unicorn/$INSTANCE.conf
 
-
-# Feel free to change any of the following variables for your app:
 TIMEOUT=${TIMEOUT-60}
 APP_ROOT=$app_root
 PID=$APP_ROOT/tmp/pids/unicorn.pid
-CMD="cd $APP_ROOT; bundle exec unicorn -D -c $APP_ROOT/config/unicorn.rb -E $3"
+CMD="cd $APP_ROOT; bundle exec unicorn -D -c $APP_ROOT/config/unicorn.rb -E $ENVIRONMENT"
 AS_USER=$user
 
 set -u
@@ -49,8 +59,11 @@ run () {
   fi
 }
 
-case "$1" in
+case "$COMMAND" in
 start)
+  if [ -z $ENVIRONMENT ]; then
+    echo >&2 "Environment name required" && exit 0
+  fi
   sig 0 && echo >&2 "Already running" && exit 0
   run "$CMD"
   ;;
@@ -63,11 +76,17 @@ force-stop)
   echo >&2 "Not running"
   ;;
 restart|reload)
+  if [ -z $ENVIRONMENT ]; then
+    echo >&2 "Environment name required" && exit 0
+  fi
   sig USR2 && echo reloaded OK && exit 0
   echo >&2 "Couldn't reload, starting '$CMD' instead"
   run "$CMD"
   ;;
 upgrade)
+  if [ -z $ENVIRONMENT ]; then
+    echo >&2 "Environment name required" && exit 0
+  fi
   if sig USR2 && sleep 2 && sig 0 && oldsig QUIT
   then
     n=$TIMEOUT
@@ -91,7 +110,7 @@ reopen-logs)
   sig USR1
   ;;
 *)
-  echo >&2 "Usage: $0 <start|stop|restart|upgrade|force-stop|reopen-logs>"
+  echo >&2 "Usage: $0 -i <instance_name> -c <start|stop|restart|upgrade|force-stop|reopen-logs> [-e <environment_name>]"
   exit 1
   ;;
 esac
