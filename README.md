@@ -1,6 +1,6 @@
 # Horny Pony
 
-Simple init script for multiply unicorn instance
+Simple init script to manage multiple unicorn instance
 
 ## Setup
 
