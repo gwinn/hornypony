@@ -4,9 +4,10 @@ Simple init script for multiply unicorn instance
 
 ## Setup
 
-* Put all files in `/etc`
+* Put all files from `/etc` to your `/etc` directory
+* Put `unicorn.rb` into your project
 * Change user name & application path in *.conf files
-* Make sure that you have bundle gem installed
+* Make sure that you have bundle & unicorn gems installed
 
 
 ## Usage
