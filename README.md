@@ -14,7 +14,7 @@ Simple init script to manage multiple unicorn instance
 
 To control your unicorn instances run:
 
-`/etc/init.d/pony [-i <instance_name>] -c <start|stop|restart|upgrade|force-stop> [-e <development|production|test>]`
+`/etc/init.d/pony -c <start|stop|restart|upgrade|force-stop> [-i <instance_name>] [-e <development|production|test>]`
 
 Instance_name is a name of one of your configuration files in `/etc/unicorn` directory, if you don't pass it with `-i` parameter, hornypony will execute selected command for all instances.
 
