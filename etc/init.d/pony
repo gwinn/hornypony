@@ -38,10 +38,6 @@ sig () {
   test -s "$PID" && kill -$1 `cat $PID`
 }
 
-oldsig () {
-  test -s $OLD_PIN && kill -$1 `cat $OLD_PIN`
-}
-
 run_task() {
   . /etc/unicorn/$1.conf
 
