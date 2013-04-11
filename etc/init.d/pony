@@ -64,7 +64,7 @@ run_task() {
     run "$CMD"
     echo -e "${TEXT_GRN}\tapp started  OK${TEXT_RES}"
     if [ $jobs_exec ]; then
-      run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec start >/dev/null 2>&1"
+      run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec -n 6 --queues=mailers,system,user start >/dev/null 2>&1"
       echo -e "${TEXT_GRN}\tjobs started OK${TEXT_RES}"
     fi
     if [ $cron_exec ]; then
@@ -105,7 +105,7 @@ run_task() {
     && echo "${TEXT_GRN}restarting ${1}${TEXT_RES}" \
     && echo -e "${TEXT_GRN}\tapp restarted  OK${TEXT_RES}" \
     && if [ $jobs_exec ]; \
-      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec restart >/dev/null 2>&1"; \
+      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec -n 6 --queues=mailers,system,user restart >/dev/null 2>&1"; \
       echo -e "${TEXT_GRN}\tjobs restarted OK${TEXT_RES}"; fi \
     && if [ $cron_exec ]; \
       then run "cd $app_root; RAILS_ENV=$ENVIRONMENT $cron_exec -c $cron_file restart >/dev/null 2>&1"; \
