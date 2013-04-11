@@ -6,7 +6,7 @@ require 'clockwork'
 include Clockwork
 
 Clockwork.configure do |config|
-  config[:logger] = Logger.new('./log/cron.log')
+  config[:logger] = Logger.new(File.expand_path('../../../log/cron.log', __FILE__))
 end
 
 handler do |job|
