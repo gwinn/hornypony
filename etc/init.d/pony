@@ -39,40 +39,79 @@ sig () {
 }
 
 run_task() {
+  unset app_root
+  unset jobs_exec
+  unset cron_exec
+  unset cron_file
+
   . /etc/unicorn/$1.conf
 
-  APP_ROOT=$app_root
-  PID=$APP_ROOT/tmp/pids/unicorn.pid
-  CMD="cd $APP_ROOT; bundle exec unicorn -D -c $APP_ROOT/config/unicorn.rb -E $ENVIRONMENT"
-  AS_USER=$user
+  PID=$app_root/tmp/pids/unicorn.pid
+  CMD="cd $app_root; bundle exec unicorn -D -c $app_root/config/unicorn.rb -E $ENVIRONMENT"
 
   run () {
-    if [ "$(id -un)" = "$AS_USER" ]; then
+    if [ "$(id -un)" = "$user" ]; then
       eval $1
     else
-      su -c "$1" - $AS_USER
+      su -c "$1" - $user
     fi
   }
 
   case "$COMMAND" in
   start)
     sig 0 && echo >&2 "${TEXT_RED}${1} already running${TEXT_RES}" && return 0
+    echo "${TEXT_GRN}${1} starting in ${ENVIRONMENT} environment${TEXT_RES}"
     run "$CMD"
-    echo "${TEXT_GRN}${1} started in ${ENVIRONMENT} environment OK${TEXT_RES}"
+    echo -e "${TEXT_GRN}\tapp started  OK${TEXT_RES}"
+    if [ $jobs_exec ]; then
+      run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec start >/dev/null 2>&1"
+      echo -e "${TEXT_GRN}\tjobs started OK${TEXT_RES}"
+    fi
+    if [ $cron_exec ]; then
+      run "cd $app_root; RAILS_ENV=$ENVIRONMENT $cron_exec -c $cron_file start >/dev/null 2>&1"
+      echo -e "${TEXT_GRN}\tcron started OK${TEXT_RES}"
+    fi
+    return 0
     ;;
   stop)
-    sig QUIT && echo "${TEXT_GRN}${1} stoped OK${TEXT_RES}" && return 0
+    sig QUIT \
+    && echo "${TEXT_GRN}${1} is stoping${TEXT_RES}" \
+    && echo -e "${TEXT_GRN}\tapp stoped  OK${TEXT_RES}" \
+    && if [ $jobs_exec ]; \
+      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec stop >/dev/null 2>&1"; \
+      echo -e "${TEXT_GRN}\tjobs stoped OK${TEXT_RES}"; fi \
+    && if [ $cron_exec ]; \
+      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT $cron_exec -c $cron_file stop >/dev/null 2>&1"; \
+      echo -e "${TEXT_GRN}\tcron stoped OK${TEXT_RES}"; fi \
+    && return 0
     echo >&2 "${TEXT_RED}${1} not running${TEXT_RES}"
     ;;
   force-stop)
-    sig TERM && echo "${TEXT_GRN}${1} force-stoped OK${TEXT_RES}" && return 0
-    echo >&2 "${TEXT_RED}${1} not running${TEXT_RES}"
+    sig TERM \
+    && echo "${TEXT_GRN}${1} is force-stoping${TEXT_RES}" \
+    && echo -e "${TEXT_GRN}\tapp stoped  OK${TEXT_RES}" \
+    && if [ $jobs_exec ]; \
+      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec stop >/dev/null 2>&1"; \
+      echo -e "${TEXT_GRN}\tjobs stoped OK${TEXT_RES}"; fi \
+    && if [ $cron_exec ]; \
+      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT $cron_exec -c $cron_file stop >/dev/null 2>&1"; \
+      echo -e "${TEXT_GRN}\tcron stoped OK${TEXT_RES}"; fi \
+    && return 0
+    echo >&2 "${TEXT_RED}${1} not running${TEXT_RES}" && return 0
     ;;
   restart)
-    sig TERM
-    run "$CMD"
-    echo "${TEXT_GRN}${1} reloaded OK${TEXT_RES}"
-    return 0
+    sig TERM \
+    && run "$CMD" \
+    && echo "${TEXT_GRN}restarting ${1}${TEXT_RES}" \
+    && echo -e "${TEXT_GRN}\tapp restarted  OK${TEXT_RES}" \
+    && if [ $jobs_exec ]; \
+      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT bundle exec $jobs_exec restart >/dev/null 2>&1"; \
+      echo -e "${TEXT_GRN}\tjobs restarted OK${TEXT_RES}"; fi \
+    && if [ $cron_exec ]; \
+      then run "cd $app_root; RAILS_ENV=$ENVIRONMENT $cron_exec -c $cron_file restart >/dev/null 2>&1"; \
+      echo -e "${TEXT_GRN}\tcron restarted OK${TEXT_RES}"; fi \
+    && return 0
+    echo >&2 "${TEXT_RED}${1} not running${TEXT_RES}" && return 0
     ;;
   *)
     echo >&2 "${TEXT_YEL}Usage: $(basename "$0") -c <start|stop|restart|force-stop> [-e <environment_name>][-i <instance_name>]${TEXT_RES}"
