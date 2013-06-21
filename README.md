@@ -15,9 +15,9 @@ Simple init script to manage multiple unicorn instance
 
 To control your unicorn instances run:
 
-`sh /path/to/pony [-t] [-j] -c <start|stop|restart> [-i <instance_name>] [-e <development|production|test>]`
+`sh /path/to/pony [-t] [-j] -c <start|stop|restart> [-i <instance>] [-e <development|production|test>]`
 
-`<instance_name>` is a name of one of your configuration files in `/etc/unicorn` directory. 
+`<instance>` is a name of one of your configuration files in `/etc/unicorn` directory. 
 If you don't pass it with `-i` parameter, hornypony will execute selected command for all instances.
 
 By default environment parameter is `development`. 
