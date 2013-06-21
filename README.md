@@ -4,8 +4,9 @@ Simple init script to manage multiple unicorn instance
 
 ## Setup
 
-* Put all files from `/etc` to your `/etc` directory
-* Put `unicorn.rb` into your project
+* Put `pony` script to any place you like
+* Put all files from `unicorn` to your system `/etc/unicorn` directory
+* Put `unicorn.rb` into your project `config` directory
 * Change user name & application path in *.conf files
 * Make sure that you have bundle & unicorn gems installed
 
@@ -14,8 +15,14 @@ Simple init script to manage multiple unicorn instance
 
 To control your unicorn instances run:
 
-`/etc/init.d/pony -c <start|stop|restart|upgrade|force-stop> [-i <instance_name>] [-e <development|production|test>]`
+`sh /path/to/pony [-t] [-j] -c <start|stop|restart> [-i <instance_name>] [-e <development|production|test>]`
 
-`<instance_name>` is a name of one of your configuration files in `/etc/unicorn` directory, if you don't pass it with `-i` parameter, hornypony will execute selected command for all instances.
+`<instance_name>` is a name of one of your configuration files in `/etc/unicorn` directory. 
+If you don't pass it with `-i` parameter, hornypony will execute selected command for all instances.
 
-By default environment parameter is `development`, to change this on start or restart you instance pass `-e` parameter as showed in example above.
+By default environment parameter is `development`. 
+To change this on start or restart of your instance pass `-e` parameter as showed in example above.
+
+Optional parameters `-t` and `-j` tells `pony` that it must to start, stop or restart additional scripts like an `delayed_job` or `clockworkd`. 
+Configuration files for that scripts can be placed in `/etc/unicorn/cron` or `/etc/unicorn/jobs/`. 
+These files should be named identical to the name of the instance.
