@@ -24,5 +24,5 @@ By default environment parameter is `development`.
 To change it on start or restart pass `-e` parameter as showed in example above.
 
 Optional parameters `-t` and `-j` tells `pony` that it must to start, stop or restart additional scripts like an `delayed_job` or `clockworkd`. 
-Configuration files for that scripts can be placed in `/etc/unicorn/cron` or `/etc/unicorn/jobs/`. 
+Configuration files for that scripts can be placed in `/etc/unicorn/cron` or `/etc/unicorn/jobs`. 
 These files should be named identical to the name of the instance.
